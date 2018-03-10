@@ -1,0 +1,12 @@
+<h1>Welcome to Vol</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<p>Please login using your Tesla account credentials:</p>
+
+<form action="{% url 'charger:login' %}" method="post">
+{% csrf_token %}
+    <input type="text" name="username" id="username" />
+    <input type="text" name="password" id="password" />
+    <input type="submit" value="Login" />
+</form>

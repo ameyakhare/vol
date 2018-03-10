@@ -1,0 +1,9 @@
+{% if vehicle_list %}
+  <ul>
+    {% for vehicle in vehicle_list %}
+      <li>{{ vehicle.name }} with Vehicle ID {{ vehicle.vehicle_id }}
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>You are not logged in or you do not own any vehicles.</p>
+{% endif %}
