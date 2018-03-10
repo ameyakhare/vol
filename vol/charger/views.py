@@ -22,9 +22,9 @@ def login(request):
     user = request.POST['username']
     password = request.POST['password']
   except:
-    return render(request, 'charger/index.html', { 
-      'error_message': 'Form data is malformed.' 
-    })
+    return render(request, 'charger/index.html', 
+      { 'error_message': 'Form data is malformed.' } if request.method == 'POST' else {}
+    )
 
   req = requests.post(
     TESLA_PATH_OATH, 
