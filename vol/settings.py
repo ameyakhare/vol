@@ -48,6 +48,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Custom session checking middleware
+    'vol.charger.middleware.session_check_middleware.SessionCheckMiddleware'
 ]
 
 ROOT_URLCONF = 'vol.urls'

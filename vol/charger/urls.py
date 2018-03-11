@@ -10,7 +10,4 @@ urlpatterns = [
 
   # /charger/login/
   path('login/', views.login, name='login'),
-
-  # /charger/vehicles/
-  path('vehicles/', views.vehicles, name='vehicles')
 ]
