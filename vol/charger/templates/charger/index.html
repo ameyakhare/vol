@@ -1,9 +1,18 @@
+<h1>Your vehicles</h1>
+
+<p>If there is a check next to the vehicle name, it is scheduled to charge overnight to standard capacity (80%).</p>
+<p>Please update the form if you would like to schedule or unschedule the charging of your vehicle.</p>
+
 {% if vehicle_list %}
-  <ul>
+  <form action="{% url 'charger:index' %}" method="post">
+  {% csrf_token %}
     {% for vehicle in vehicle_list %}
-      <li>{{ vehicle.name }} with Vehicle ID {{ vehicle.vehicle_id }}
+      <input type="checkbox" name="{{ vehicle.id }}" id="{{ vehicle.id }}" 
+        {% if vehicle.id in vehicle_scheduled %} 
+          checked="checked"
+        {% endif %}
+      /> {{ vehicle.display_name }} <br>
     {% endfor %}
-  </ul>
-{% else %}
-  <p>You are not logged in or you do not own any vehicles.</p>
+      <input type="submit" value="Update"/>
+  </form>
 {% endif %}

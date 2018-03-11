@@ -27,7 +27,8 @@ class SessionCheckMiddleware(object):
 
       # Redirect if unauthorized user is trying to access a regular page.
       if not is_authorized(username, token) and reverse('charger:login') not in request.path:
-        return HttpResponseRedirect(reverse('charger:login'))
+        if not request.path.startswith('/admin'):
+          return HttpResponseRedirect(reverse('charger:login'))
 
       request.session.set_expiry(SESSION_MAX_SECONDS)
       return self.get_response(request)

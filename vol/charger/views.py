@@ -18,6 +18,7 @@ SESSION_TOKEN = 'token'
 
 # Tesla API Paths
 TESLA_PATH_OATH = 'https://owner-api.teslamotors.com/oauth/token'
+TESLA_PATH_VEHICLES = 'https://owner-api.teslamotors.com/api/1/vehicles'
 
 def get_owner(user):
   try:
@@ -27,10 +28,44 @@ def get_owner(user):
     return None
 
 def index(request):
-  vehicle_owner = Owner.objects.get(username='fakeuser')
-  vehicle_list = Vehicle.objects.filter(owner=vehicle_owner)
+  req = requests.get(
+    TESLA_PATH_VEHICLES, 
+    headers = {
+      'Authorization': 'Bearer ' + request.session[SESSION_TOKEN]
+    }
+  )
+
+  if req.status_code != 200:
+      print('Unable to fetch vehicles for user: ' + request.session[SESSION_USERNAME])
+      vehicle_list = []
+  else:
+      vehicle_list = req.json()['response']
+
+  # The user has requested an update to the charging status of their vehicles.
+  user = Owner.objects.get(username=request.session[SESSION_USERNAME])
+  if request.method == 'POST':
+    for vehicle in vehicle_list:
+      vehicle['id'] = str(vehicle['id'])
+      if vehicle['id'] in request.POST and not Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).exists():
+        # If the vehicle was checked, make sure its in the db
+        Vehicle(owner=user, vehicle_id=vehicle['id'], name=vehicle['display_name']).save()
+
+        print('Adding vehicle: ' + vehicle['display_name'])
+      elif vehicle['id'] not in request.POST and Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).exists():
+        # If the vehicle was not checked, make sure its not in the db
+        Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).delete()
+
+        print('Removing vehicle: ' + vehicle['display_name'])
+
+  vehicle_owner = Owner.objects.get(username=request.session[SESSION_USERNAME])
+  vehicle_known = Vehicle.objects.filter(owner=vehicle_owner)
+  vehicle_scheduled = []
+  for vehicle in vehicle_known:
+    vehicle_scheduled.append(vehicle.vehicle_id)
+
   context = {
     'vehicle_list': vehicle_list,
+    'vehicle_scheduled': vehicle_scheduled,
   }
   return render(request, 'charger/index.html', context)
 
