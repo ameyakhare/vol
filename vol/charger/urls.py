@@ -10,4 +10,7 @@ urlpatterns = [
 
   # /charger/login/
   path('login/', views.login, name='login'),
+
+  # /charger/savings/
+  path('savings/', views.savings, name='savings')
 ]

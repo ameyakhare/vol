@@ -41,11 +41,14 @@ def index(request):
   else:
       vehicle_list = req.json()['response']
 
+  # Conform to string
+  for vehicle in vehicle_list:
+    vehicle['id'] = str(vehicle['id'])
+
   # The user has requested an update to the charging status of their vehicles.
   user = Owner.objects.get(username=request.session[SESSION_USERNAME])
   if request.method == 'POST':
     for vehicle in vehicle_list:
-      vehicle['id'] = str(vehicle['id'])
       if vehicle['id'] in request.POST and not Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).exists():
         # If the vehicle was checked, make sure its in the db
         Vehicle(owner=user, vehicle_id=vehicle['id'], name=vehicle['display_name']).save()
@@ -59,6 +62,7 @@ def index(request):
 
   vehicle_owner = Owner.objects.get(username=request.session[SESSION_USERNAME])
   vehicle_known = Vehicle.objects.filter(owner=vehicle_owner)
+
   vehicle_scheduled = []
   for vehicle in vehicle_known:
     vehicle_scheduled.append(vehicle.vehicle_id)
@@ -116,3 +120,6 @@ def login(request):
   request.session[SESSION_TOKEN] = access_token
   print('Everything was successful!')
   return HttpResponseRedirect(reverse('charger:index'))
+
+def savings(request):
+  return HttpsResponse('Welcome to the savings page!')
