@@ -15,4 +15,14 @@
     {% endfor %}
       <input type="submit" value="Update"/>
   </form>
+
+  <form action="{% url 'charger:savings' %}" method="get">
+    <input type="submit" value="View my savings"/>
+  </form>
+
+  <form action="{% url 'charger:logout' %}" method="get">
+    <input type="submit" value="Logout"/>
+  </form>
+{% else %}
+  <p>Looks like you don't have any vehicles!</p>
 {% endif %}

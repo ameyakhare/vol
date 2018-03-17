@@ -1,3 +1,5 @@
+import datetime
+import decimal
 import requests
 
 from django.http import HttpResponse, HttpResponseRedirect
@@ -5,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .auth import is_authorized
-from .models import Owner, Vehicle
+from .models import Owner, Vehicle, ChargeAttempt, ChargePeriod
 
 # OATH Client Info
 # This is already public, so you're not stealing anything from me :)
@@ -19,6 +21,10 @@ SESSION_TOKEN = 'token'
 # Tesla API Paths
 TESLA_PATH_OATH = 'https://owner-api.teslamotors.com/oauth/token'
 TESLA_PATH_VEHICLES = 'https://owner-api.teslamotors.com/api/1/vehicles'
+
+# Timestamp formats
+TIMESTAMP_FORMAT = '%H:%M'
+DATETIME_FORMAT = '%m/%d/%y %H:%M'
 
 def get_owner(user):
   try:
@@ -118,8 +124,59 @@ def login(request):
 
   request.session[SESSION_USERNAME] = user
   request.session[SESSION_TOKEN] = access_token
-  print('Everything was successful!')
   return HttpResponseRedirect(reverse('charger:index'))
 
+def logout(request):
+  del request.session[SESSION_USERNAME]
+  del request.session[SESSION_TOKEN]
+  return HttpResponseRedirect(reverse('charger:login'))
+
 def savings(request):
-  return HttpsResponse('Welcome to the savings page!')
+  vehicle_owner = Owner.objects.get(username=request.session[SESSION_USERNAME])
+  vehicle_scheduled = Vehicle.objects.filter(owner=vehicle_owner)
+
+  if request.method == 'POST':
+    for vehicle in vehicle_scheduled:
+      if vehicle.vehicle_id in request.POST:
+        vehicle.plug_time = datetime.datetime.strptime(request.POST[vehicle.vehicle_id], TIMESTAMP_FORMAT).time()
+        vehicle.save()
+
+  for vehicle in vehicle_scheduled:
+    vehicle.str_time = vehicle.plug_time.strftime(TIMESTAMP_FORMAT)
+
+  # Savings calculations
+  charge_attempts = ChargeAttempt.objects.filter(owner=vehicle_owner).order_by('default_start')
+  total_savings = decimal.Decimal(0.0)
+  
+  for charge_attempt in charge_attempts:
+    charge_attempt.default_start_str = charge_attempt.default_start.strftime(DATETIME_FORMAT)
+    charge_attempt.default_end_str = charge_attempt.default_end.strftime(DATETIME_FORMAT)
+
+    delta = charge_attempt.default_end - charge_attempt.default_start
+    charge_attempt.default_cost = charge_attempt.default_price * delta.seconds / 3600
+
+    charge_attempt.duration_str = '{}:{}'.format(delta.seconds // 3600, (delta.seconds % 3600) // 60)
+    
+    charge_periods = ChargePeriod.objects.filter(attempt=charge_attempt).order_by('start')
+    charge_attempt.periods = charge_periods
+
+    savings = 0
+
+    for charge_period in charge_attempt.periods:
+      charge_period.start_str = charge_period.start.strftime(DATETIME_FORMAT)
+      charge_period.end_str = charge_period.end.strftime(DATETIME_FORMAT)
+
+      delta = charge_period.end - charge_period.start
+      charge_period.cost = charge_period.price * delta.seconds / 3600
+
+      charge_period.saving = (charge_attempt.default_price - charge_period.price) * delta.seconds / 3600
+      savings += charge_period.saving
+
+    charge_attempt.savings = savings
+    total_savings += savings / 100
+
+  return render(request, 'charger/savings.html', {
+    'vehicle_scheduled': vehicle_scheduled,
+    'charge_attempts': charge_attempts,
+    'total_savings': total_savings
+  })

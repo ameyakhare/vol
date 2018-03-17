@@ -7,6 +7,6 @@
 <form action="{% url 'charger:login' %}" method="post">
 {% csrf_token %}
     <input type="text" name="username" id="username"/>
-    <input type="text" name="password" id="password"/>
+    <input type="password" name="password" id="password"/>
     <input type="submit" value="Login"/>
 </form>
