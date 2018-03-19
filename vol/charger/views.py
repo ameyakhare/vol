@@ -160,7 +160,7 @@ def savings(request):
     charge_periods = ChargePeriod.objects.filter(attempt=charge_attempt).order_by('start')
     charge_attempt.periods = charge_periods
 
-    savings = 0
+    savings = decimal.Decimal(0.0)
 
     for charge_period in charge_attempt.periods:
       charge_period.start_str = charge_period.start.strftime(DATETIME_FORMAT)
