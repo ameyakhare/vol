@@ -1,28 +1,42 @@
-<h1>Your vehicles</h1>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<style>
+.container {margin: 10%;}
+h1{color: #005b96;}
+.alert {max-width: 80%;}
+</style>
+</head>
+<body>
+  <div class="container" id="vehicle_shit">
+    <h1>Vehicles</h1>
 
-<p>If there is a check next to the vehicle name, it is scheduled to charge overnight to standard capacity (80%).</p>
-<p>Please update the form if you would like to schedule or unschedule the charging of your vehicle.</p>
+    <p>If there is a check next to the vehicle name, it is scheduled to charge overnight to standard capacity (80%).</p>
+    <p>Please update the form if you would like to schedule or unschedule the charging of your vehicle.</p>
 
-{% if vehicle_list %}
-  <form action="{% url 'charger:index' %}" method="post">
-  {% csrf_token %}
-    {% for vehicle in vehicle_list %}
-      <input type="checkbox" name="{{ vehicle.id }}" id="{{ vehicle.id }}" 
-        {% if vehicle.id in vehicle_scheduled %} 
-          checked="checked"
-        {% endif %}
-      /> {{ vehicle.display_name }} <br>
-    {% endfor %}
-      <input type="submit" value="Update"/>
-  </form>
+    {% if vehicle_list %}
+      <div class="alert alert-light" role="alert">
+        <form action="{% url 'charger:index' %}" method="post">
+        {% csrf_token %}
+          {% for vehicle in vehicle_list %}
+            <input type="checkbox" name="{{ vehicle.id }}" id="{{ vehicle.id }}" 
+              {% if vehicle.id in vehicle_scheduled %} 
+                checked="checked"
+              {% endif %}
+            /> {{ vehicle.display_name }} <br>
+          {% endfor %}
+          <br>
+            <button type="submit" class="btn btn-warning" value="Update">Update</button>
+        </form>
+      </div>
+      <form action="{% url 'charger:savings' %}" method="get">
+        <button type="submit" class="btn btn-outline-warning" value="View Savings">View Savings</button>
+      </form>
 
-  <form action="{% url 'charger:savings' %}" method="get">
-    <input type="submit" value="View my savings"/>
-  </form>
-
-  <form action="{% url 'charger:logout' %}" method="get">
-    <input type="submit" value="Logout"/>
-  </form>
-{% else %}
-  <p>Looks like you don't have any vehicles!</p>
-{% endif %}
+      <form action="{% url 'charger:logout' %}" method="get">
+        <button type="submit" class="btn btn-outline-warning" value="Logout">Logout</button>
+      </form>
+    {% else %}
+      <p>Looks like you don't have any vehicles!</p>
+    {% endif %}
+  </div>
+</body>

@@ -1,12 +1,25 @@
-<h1>Welcome to Vol</h1>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<style>
+.container {margin: 10%;}
+h1{color: #005b96;}
+p{color: #005b96;}
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+</style>
+</head>
+<body>
+	<div class="container" id="login_shit">
+		<h1>Vol</h1>
 
-<p>Please login using your Tesla account credentials:</p>
+		{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'charger:login' %}" method="post">
-{% csrf_token %}
-    <input type="text" name="username" id="username"/>
-    <input type="password" name="password" id="password"/>
-    <input type="submit" value="Login"/>
-</form>
+		<p>Please login using your Tesla account credentials:</p>
+
+		<form action="{% url 'charger:login' %}" method="post">
+		{% csrf_token %}
+		    <input type="text" placeholder="username" name="username" id="username"/>
+		    <input type="password" placeholder="password" name="password" id="password"/>
+		    <button type="submit" class="btn btn-warning">Submit</button>
+		</form>
+	</div>
+</body>

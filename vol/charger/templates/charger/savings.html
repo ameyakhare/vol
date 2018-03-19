@@ -1,47 +1,59 @@
-<h1>Your savings</h1>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<style>
+.container {margin: 10%;}
+h1{color: #005b96;}
+</style>
+</head>
+<body>
+  <div class="container" id="savings_shit">
 
-<p>The following is a list of days that one or more of your vehicles was scheduled to charge for. For that day, 
-you can see what time periods the vehicle was charged for and what the total charging time and cost was.</p>
-<p>To obtain accurate savings data, please input the approximate time you come home from work and plug
-in your Tesla that you have scheduled for charging each day. This information will be used to determine when to 
-start checking whether the Tesla has been plugged in.</p>
+    <h1>Your savings</h1>
 
-{% if vehicle_scheduled %}
-  <form action="{% url 'charger:savings' %}" method="post">
-    {% csrf_token %}
-    {% for vehicle in vehicle_scheduled %}
-      <input type="time" name="{{ vehicle.vehicle_id }}" id="{{ vehicle.vehicle_id }}" value="{{ vehicle.str_time }}"> {{ vehicle.name }} <br>
-    {% endfor %}
-    <input type="submit" value="Update"/>
-  </form>
-{% else %}
-  <p>It looks like you have no vehicles scheduled for charging. You can still view your historical data below.</p>
-{% endif %}
+    <p>The following is a list of days that one or more of your vehicles was scheduled to charge for. For that day, 
+    you can see what time periods the vehicle was charged for and what the total charging time and cost was.</p>
+    <p>To obtain accurate savings data, please input the approximate time you come home from work and plug
+    in your Tesla that you have scheduled for charging each day. This information will be used to determine when to 
+    start checking whether the Tesla has been plugged in.</p>
 
-<form action="{% url 'charger:index' %}" method="get">
-  <input type="submit" value="View my vehicles"/>
-</form>
-
-<ul>
-  {% for charge_attempt in charge_attempts %}
-    <li>Charge scheduled for {{ charge_attempt.vehicle_name }} plugged in at {{ charge_attempt.default_start_str }} <br>
-      Charge time required: {{ charge_attempt.duration_str }} <br>
-      Charge amount required: {{ charge_attempt.default_kwh|floatformat:2 }} kWh <br>
-      Default charge cost: {{ charge_attempt.default_cost|floatformat:2 }}¢ @ {{ charge_attempt.default_price }}¢/kWh <br>
-      Savings from this scheduled charge: {{ charge_attempt.savings|floatformat:2 }}¢ <br>
-      Charging periods:
-      <ul>
-        {% for charge_period in charge_attempt.periods %}
-          <li>{{ charge_period.start_str }} to {{ charge_period.end_str }} @ {{ charge_period.price|floatformat:2 }}¢/kWh <br>
-            Charge period amount: {{ charge_period.kwh|floatformat:2 }} kWh<br>
-            Charge period cost: {{ charge_period.cost|floatformat:2 }}¢ <br>
-            Charge period savings: {{ charge_period.saving }}¢
-          </li>
+    {% if vehicle_scheduled %}
+      <form action="{% url 'charger:savings' %}" method="post">
+        {% csrf_token %}
+        {% for vehicle in vehicle_scheduled %}
+          <input type="time" name="{{ vehicle.vehicle_id }}" id="{{ vehicle.vehicle_id }}" value="{{ vehicle.str_time }}"> {{ vehicle.name }} <br>
         {% endfor %}
-      </ul>
-      
-    </li>
-  {% endfor %}
-</ul>
+        <input type="submit" value="Update"/>
+      </form>
+    {% else %}
+      <p>It looks like you have no vehicles scheduled for charging. You can still view your historical data below.</p>
+    {% endif %}
 
-<p>Your total savings has been ${{ total_savings|floatformat:2 }}!</p>
+    <form action="{% url 'charger:index' %}" method="get">
+      <button type="submit" class="btn btn-outline-warning">Vehicles</button>
+    </form>
+
+    <ul>
+      {% for charge_attempt in charge_attempts %}
+        <li>Charge scheduled for {{ charge_attempt.vehicle_name }} plugged in at {{ charge_attempt.default_start_str }} <br>
+          Charge time required: {{ charge_attempt.duration_str }} <br>
+          Charge amount required: {{ charge_attempt.default_kwh|floatformat:2 }} kWh <br>
+          Default charge cost: {{ charge_attempt.default_cost|floatformat:2 }}¢ @ {{ charge_attempt.default_price }}¢/kWh <br>
+          Savings from this scheduled charge: {{ charge_attempt.savings|floatformat:2 }}¢ <br>
+          Charging periods:
+          <ul>
+            {% for charge_period in charge_attempt.periods %}
+              <li>{{ charge_period.start_str }} to {{ charge_period.end_str }} @ {{ charge_period.price|floatformat:2 }}¢/kWh <br>
+                Charge period amount: {{ charge_period.kwh|floatformat:2 }} kWh<br>
+                Charge period cost: {{ charge_period.cost|floatformat:2 }}¢ <br>
+                Charge period savings: {{ charge_period.saving }}¢
+              </li>
+            {% endfor %}
+          </ul>
+          
+        </li>
+      {% endfor %}
+    </ul>
+
+    <p>Your total savings has been ${{ total_savings|floatformat:2 }}!</p>
+  </div>
+</body>
