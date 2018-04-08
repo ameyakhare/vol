@@ -35,44 +35,33 @@ h1{color: #005b96;}
     </form>
 
     <ul>
-
-
-    <!--{% for charge_attempt in charge_attempts %}-->
         <canvas id="SavingsChart" width="400" height="400"></canvas>
         <script>
           var ctx = $("#SavingsChart");
           var chart = new Chart(ctx, {
-            label : 'Savings'
+            label : 'Savings',
             type: 'line',
-            data: {
+            data: [
               {% for charge_attempt in charge_attempts %}
                 {
-                  t: {{ charge_attempt. }}
-                  y:
+                  t: "{{ charge_attempt.default_start_str }}",
+                  y: {{ charge_attempt.savings|floatformat:2 }}
+                },
+                {
+                  t: "04/02/18 16:55",
+                  y: 31.5
+                },
+                {
+                  t: "04/05/18 12:00",
+                  y: 20.5
                 }
               {% endfor %}
-            },
-            options: {
-              scales: {
-                xAxes: [{
-                  type: 'time',
-                  distribution: 'series',
-                  ticks: {
-                    source: 'labels'
-                  }
-                }],
-                yAxes: [{
-                  scaleLabel: {
-                    display: true,
-                    labelString: 'Closing price ($)'
-                  }
-                }]
-              }
-            }
+            ]
           })
-
-
         </script>
+
+        {% for charge_attempt in charge_attempts %}
+
         <li>Charge scheduled for {{ charge_attempt.vehicle_name }} plugged in at {{ charge_attempt.default_start_str }} <br>
           Charge time required: {{ charge_attempt.duration_str }} <br>
           Charge amount required: {{ charge_attempt.default_kwh|floatformat:2 }} kWh <br>

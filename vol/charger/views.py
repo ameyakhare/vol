@@ -25,6 +25,7 @@ TESLA_PATH_VEHICLES = 'https://owner-api.teslamotors.com/api/1/vehicles'
 # Timestamp formats
 TIMESTAMP_FORMAT = '%H:%M'
 DATETIME_FORMAT = '%m/%d/%y %H:%M'
+DATE_FORMAT = '%m/%d/%y'
 
 def get_owner(user):
   try:
@@ -151,7 +152,9 @@ def savings(request):
   for charge_attempt in charge_attempts:
     charge_attempt.default_start_str = charge_attempt.default_start.strftime(DATETIME_FORMAT)
     charge_attempt.default_end_str = charge_attempt.default_end.strftime(DATETIME_FORMAT)
+    charge_attempt.default_start_date = charge_attempt.default_start.strftime(DATE_FORMAT)
 
+    delta = charge_attempt.default_end - charge_attempt.default_start
     charge_attempt.default_cost = charge_attempt.default_price * charge_attempt.default_kwh
     charge_attempt.duration_str = '{}:{}'.format(delta.seconds // 3600, (delta.seconds % 3600) // 60)
     
