@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
 <style>
 .container {margin: 10%;}
 h1{color: #005b96;}
@@ -37,27 +38,42 @@ h1{color: #005b96;}
     <ul>
         <canvas id="SavingsChart" width="400" height="400"></canvas>
         <script>
-          var ctx = $("#SavingsChart");
-          var chart = new Chart(ctx, {
-            label : 'Savings',
+          //var ctx = $("#SavingsChart");
+
+          var config = {
             type: 'line',
-            data: [
-              {% for charge_attempt in charge_attempts %}
-                {
-                  t: "{{ charge_attempt.default_start_str }}",
-                  y: {{ charge_attempt.savings|floatformat:2 }}
-                },
-                {
-                  t: "04/02/18 16:55",
-                  y: 31.5
-                },
-                {
-                  t: "04/05/18 12:00",
-                  y: 20.5
-                }
-              {% endfor %}
-            ]
-          })
+            data: {
+              labels: [{% for charge_attempt in charge_attempts %} new Date(20{{ charge_attempt.year }}, {{ charge_attempt.month }}, {{charge_attempt.day}}), {% endfor %} new Date(2018, 04, 03), new Date(2018, 04, 04), new Date(2018, 04, 05), new Date(2018, 04, 06), new Date(2018, 04, 07)],
+              datasets: [{
+                label: 'Savings',
+                data: [{% for charge_attempt in charge_attempts %} {{ charge_attempt.savings|floatformat:2 }} {% endfor %}, 1, 2, 3, 4, 5]
+              }]
+            },
+            options: {
+              scales: {
+                  xAxes: [{
+                      type: 'time',
+                      time: {
+                        unit : 'day',
+                        displayFormats: {
+                          day : 'MM DD YY'
+                        }
+                      },
+                      ticks: {
+                        source: 'auto'
+                      },
+                      distribution: 'series'
+                  }]
+              }
+            }
+          };
+
+          window.onload = function() {
+            var ctx = document.getElementById('SavingsChart').getContext('2d');
+
+            window.myLine = new Chart(ctx, config);
+
+          };
         </script>
 
         {% for charge_attempt in charge_attempts %}
