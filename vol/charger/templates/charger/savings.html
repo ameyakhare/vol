@@ -1,5 +1,7 @@
 <head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <style>
 .container {margin: 10%;}
 h1{color: #005b96;}
@@ -34,6 +36,19 @@ h1{color: #005b96;}
 
     <ul>
       {% for charge_attempt in charge_attempts %}
+
+        <canvas id="SavingsChart" width="400" height="400"></canvas>
+        <script>
+          var ctx = $("#SavingsChart");
+          var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              
+            }
+          })
+
+
+        </script>
         <li>Charge scheduled for {{ charge_attempt.vehicle_name }} plugged in at {{ charge_attempt.default_start_str }} <br>
           Charge time required: {{ charge_attempt.duration_str }} <br>
           Charge amount required: {{ charge_attempt.default_kwh|floatformat:2 }} kWh <br>
