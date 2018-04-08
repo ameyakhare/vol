@@ -35,15 +35,39 @@ h1{color: #005b96;}
     </form>
 
     <ul>
-      {% for charge_attempt in charge_attempts %}
 
+
+    <!--{% for charge_attempt in charge_attempts %}-->
         <canvas id="SavingsChart" width="400" height="400"></canvas>
         <script>
           var ctx = $("#SavingsChart");
           var chart = new Chart(ctx, {
+            label : 'Savings'
             type: 'line',
             data: {
-              
+              {% for charge_attempt in charge_attempts %}
+                {
+                  t: {{ charge_attempt. }}
+                  y:
+                }
+              {% endfor %}
+            },
+            options: {
+              scales: {
+                xAxes: [{
+                  type: 'time',
+                  distribution: 'series',
+                  ticks: {
+                    source: 'labels'
+                  }
+                }],
+                yAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Closing price ($)'
+                  }
+                }]
+              }
             }
           })
 
