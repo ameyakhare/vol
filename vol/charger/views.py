@@ -152,9 +152,7 @@ def savings(request):
     charge_attempt.default_start_str = charge_attempt.default_start.strftime(DATETIME_FORMAT)
     charge_attempt.default_end_str = charge_attempt.default_end.strftime(DATETIME_FORMAT)
 
-    delta = charge_attempt.default_end - charge_attempt.default_start
-    charge_attempt.default_cost = charge_attempt.default_price * delta.seconds / 3600
-
+    charge_attempt.default_cost = charge_attempt.default_price * charge_attempt.default_kwh
     charge_attempt.duration_str = '{}:{}'.format(delta.seconds // 3600, (delta.seconds % 3600) // 60)
     
     charge_periods = ChargePeriod.objects.filter(attempt=charge_attempt).order_by('start')
@@ -166,10 +164,8 @@ def savings(request):
       charge_period.start_str = charge_period.start.strftime(DATETIME_FORMAT)
       charge_period.end_str = charge_period.end.strftime(DATETIME_FORMAT)
 
-      delta = charge_period.end - charge_period.start
-      charge_period.cost = charge_period.price * delta.seconds / 3600
-
-      charge_period.saving = (charge_attempt.default_price - charge_period.price) * delta.seconds / 3600
+      charge_period.cost = charge_period.price * charge_period.kwh
+      charge_period.saving = (charge_attempt.default_price - charge_period.price) * charge_period.kwh
       savings += charge_period.saving
 
     charge_attempt.savings = savings

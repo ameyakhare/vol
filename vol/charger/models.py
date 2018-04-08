@@ -16,6 +16,7 @@ class Vehicle(models.Model):
   vehicle_id = models.CharField(max_length=50)
   name = models.CharField(max_length=50)
   plug_time = models.TimeField(default=datetime.time(hour=19, minute=0))
+  unplug_time = models.TimeField(default=datetime.time(hour=6, minute=0))
 
   def __str__(self):
     return self.owner.username + ': ' + self.vehicle_id +  ' @ ' + self.plug_time.strftime('%H:%M')
