@@ -152,12 +152,15 @@ def savings(request):
   charge_attempts = ChargeAttempt.objects.filter(owner=vehicle_owner).order_by('default_start')
   total_savings = decimal.Decimal(0.0)
   
+  num = 0
   for charge_attempt in charge_attempts:
     charge_attempt.default_start_str = charge_attempt.default_start.strftime(DATETIME_FORMAT)
     charge_attempt.default_end_str = charge_attempt.default_end.strftime(DATETIME_FORMAT)
     charge_attempt.day = charge_attempt.default_start.strftime(DAY_FORMAT)
     charge_attempt.month = charge_attempt.default_start.strftime(MONTH_FORMAT)
     charge_attempt.year = charge_attempt.default_start.strftime(YEAR_FORMAT)
+    charge_attempt.num = num
+    num += 1
 
     delta = charge_attempt.default_end - charge_attempt.default_start
     charge_attempt.default_cost = charge_attempt.default_price * charge_attempt.default_kwh
@@ -171,6 +174,10 @@ def savings(request):
     for charge_period in charge_attempt.periods:
       charge_period.start_str = charge_period.start.strftime(DATETIME_FORMAT)
       charge_period.end_str = charge_period.end.strftime(DATETIME_FORMAT)
+
+      charge_period.day = charge_period.start.strftime(DAY_FORMAT)
+      charge_period.month = charge_period.start.strftime(MONTH_FORMAT)
+      charge_period.year = charge_period.start.strftime(YEAR_FORMAT)
 
       charge_period.cost = charge_period.price * charge_period.kwh
       charge_period.saving = (charge_attempt.default_price - charge_period.price) * charge_period.kwh
