@@ -46,7 +46,7 @@ h1{color: #005b96;}
               labels: [{% for charge_attempt in charge_attempts %} new Date(20{{ charge_attempt.year }}, {{ charge_attempt.month }}, {{charge_attempt.day}}), {% endfor %} new Date(2018, 04, 03), new Date(2018, 04, 04), new Date(2018, 04, 05), new Date(2018, 04, 06), new Date(2018, 04, 07)],
               datasets: [{
                 label: 'Savings',
-                data: [{% for charge_attempt in charge_attempts %} {{ charge_attempt.savings|floatformat:2 }} {% endfor %}, 1, 2, 3, 4, 5]
+                data: [{% for charge_attempt in charge_attempts %} {{ charge_attempt.savings|floatformat:2 }}, {% endfor %}, 1, 2, 3, 4, 5]
               }]
             },
             options: {
