@@ -1,17 +1,32 @@
 <head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <style>
-.container {margin: 10%;}
+.container {margin: 3%;}
 h1{color: #005b96;}
 .alert {max-width: 80%;}
 </style>
 </head>
 <body>
   <div class="container" id="vehicle_shit">
-    <h1>Vehicles</h1>
+    <div class="row">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'charger:index' %}">Vehicles</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'charger:savings' %}">Savings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'charger:logout' %}">Logout</a>
+        </li>
+      </ul>
+    </div>
+    <br>
 
-    <p>If there is a check next to the vehicle name, it is scheduled to charge overnight to standard capacity (80%).</p>
-    <p>Please update the form if you would like to schedule or unschedule the charging of your vehicle.</p>
+    <h1>Vehicles</h1>
+    <p>Update the form to schedule smart-charging for your vehicle.</p>
 
     {% if v %}
       <div class="alert alert-light" role="alert">
@@ -63,13 +78,6 @@ h1{color: #005b96;}
         <input type="submit" value="Update"/>
       </form> -->
       </div>
-      <form action="{% url 'charger:savings' %}" method="get">
-        <button type="submit" class="btn btn-outline-warning" value="View Savings">View Savings</button>
-      </form>
-
-      <form action="{% url 'charger:logout' %}" method="get">
-        <button type="submit" class="btn btn-outline-warning" value="Logout">Logout</button>
-      </form>
     {% else %}
       <p>Looks like you don't have any vehicles!</p>
     {% endif %}
