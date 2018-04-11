@@ -126,7 +126,7 @@ h1{color: #005b96;}
               <td scope="col"> {{ charge_period.start_str }} to {{ charge_period.end_str }}</td>
               <td> {{ charge_period.kwh|floatformat:2 }} kWh </td>
               <td> {{ charge_period.cost|floatformat:2 }}¢ </td>
-              <td> {{ charge_period.saving }}¢ </td>
+              <td> {{ charge_period.saving|floatformat:2 }}¢ </td>
             </tr>
             {% endfor %}
 
