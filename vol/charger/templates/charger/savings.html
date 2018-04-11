@@ -4,6 +4,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <style>
 .container {margin: 3%;}
 h1{color: #005b96;}
@@ -37,9 +38,6 @@ h1{color: #005b96;}
 
     <p>The following is a list of days that one or more of your vehicles was scheduled to charge for. For that day, 
     you can see what time periods the vehicle was charged for and what the total charging time and cost was.</p>
-    <p>To obtain accurate savings data, please input the approximate time you come home from work and plug
-    in your Tesla that you have scheduled for charging each day. This information will be used to determine when to 
-    start checking whether the Tesla has been plugged in.</p>
 
     <ul>
         <div style="width:50%; height:50%">
@@ -101,44 +99,42 @@ h1{color: #005b96;}
         </script>
         <br>
         <p style="font-weight: bold">Your total savings has been ${{ total_savings|floatformat:2 }}!</p>
+        
+        <div id="accordion">
+          {% for charge_attempt in charge_attempts %}
+          <div class="card">
+            <div class="card-header" id="{{ charge_attempt.num }}_heading">
+              <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#{{ charge_attempt.num }}_card" aria-expanded="false" aria-controls="{{ charge_attempt.num }}_card">
+                  Charge scheduled for {{ charge_attempt.vehicle_name }} plugged in at {{ charge_attempt.default_start_str }}
+                </button>
+              </h5>
+            </div>
+            <div id="{{ charge_attempt.num }}_card" class="collapse" aria-labelledby="{{ charge_attempt.num }}_heading" data-parent="#accordion">
+              <div class="card-body">
+                <table class="table">
+                  <tr>
+                    <th scope="col"> Charge Period </th>
+                    <th scope="col"> Amount Charged </th>
+                    <th scope="col"> Cost </th>
+                    <th scope="col"> Savings </th>
+                  </tr>
+                  {% for charge_period in charge_attempt.periods %}
+                  <tr>
+                    <td scope="col"> {{ charge_period.start_str }} to {{ charge_period.end_str }}</td>
+                    <td> {{ charge_period.kwh|floatformat:2 }} kWh </td>
+                    <td> {{ charge_period.cost|floatformat:2 }}¢ </td>
+                    <td> {{ charge_period.saving|floatformat:2 }}¢ </td>
+                  </tr>
+                {% endfor %}
 
-        {% for charge_attempt in charge_attempts %}
+              </table>
 
-        <li id="li{{ charge_attempt.num }}">Charge scheduled for {{ charge_attempt.vehicle_name }} plugged in at {{ charge_attempt.default_start_str }} <br>
-          Charge time required: {{ charge_attempt.duration_str }} <br>
-          Charge amount required: {{ charge_attempt.default_kwh|floatformat:2 }} kWh <br>
-          Default charge cost: {{ charge_attempt.default_cost|floatformat:2 }}¢ @ {{ charge_attempt.default_price }}¢/kWh <br>
-          Savings from this scheduled charge: {{ charge_attempt.savings|floatformat:2 }}¢ <br><br>
-         
-          <table class="table">
-            <tr>
-              <th scope="col"> Charge Period </th>
-              <th scope="col"> Amount Charged </th>
-              <th scope="col"> Cost </th>
-              <th scope="col"> Savings </th>
-            </tr>
-            {% for charge_period in charge_attempt.periods %}
-            <tr>
-              <td scope="col"> {{ charge_period.start_str }} to {{ charge_period.end_str }}</td>
-              <td> {{ charge_period.kwh|floatformat:2 }} kWh </td>
-              <td> {{ charge_period.cost|floatformat:2 }}¢ </td>
-              <td> {{ charge_period.saving|floatformat:2 }}¢ </td>
-            </tr>
-            {% endfor %}
+              <div id="div{{ charge_attempt.num }}" style="width:35%; height:35%">
+                <canvas id="canvasnum{{ charge_attempt.num }}" style="width:35%; height:35%;"></canvas>
+              </div>
 
-          </table>
-
-          <div id="div{{ charge_attempt.num }}" style="width:35%; height:35%">
-            <canvas id="canvasnum{{ charge_attempt.num }}" style="width:35%; height:35%;"></canvas>
-          </div>
-
-          <script>
-
-          /*
-
-                  backgroundColor: [
-                      'rgba(252,193,43,1)'
-                      ]*/
+              <script>
             var config1 = {
               type: 'line',
               data: {
@@ -176,27 +172,20 @@ h1{color: #005b96;}
                           display: true,
                           labelString: 'Time'
                         }
-                    }]
-                }
-              }
-            };
-            var ctx1 = document.getElementById('canvasnum{{ charge_attempt.num }}').getContext('2d');
+                      }]
+                    }
+                  }
+                };
+                var ctx1 = document.getElementById('canvasnum{{ charge_attempt.num }}').getContext('2d');
 
-            window.myLine = new Chart(ctx1, config1);
-
-          </script>
-         <!--  <ul>
-            {% for charge_period in charge_attempt.periods %}
-              <li>{{ charge_period.start_str }} to {{ charge_period.end_str }} @ {{ charge_period.price|floatformat:2 }}¢/kWh <br>
-                Charge period amount: {{ charge_period.kwh|floatformat:2 }} kWh<br>
-                Charge period cost: {{ charge_period.cost|floatformat:2 }}¢ <br>
-                Charge period savings: {{ charge_period.saving }}¢
-              </li>
-            {% endfor %}
-          </ul> -->
-          
+                window.myLine = new Chart(ctx1, config1);
+              </script>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
         </li>
-      {% endfor %}
     </ul>
 
   </div>
