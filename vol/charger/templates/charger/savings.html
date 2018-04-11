@@ -50,7 +50,7 @@ h1{color: #005b96;}
           var config = {
             type: 'line',
             data: {
-              labels: [{% for charge_attempt in charge_attempts %} new Date(20{{ charge_attempt.year }}, {{ charge_attempt.month }}, {{ charge_attempt.day }}), {% endfor %}],
+              labels: [{% for charge_attempt in charge_attempts %} moment(new Date(20{{ charge_attempt.year }}, {{ charge_attempt.month }}, {{ charge_attempt.day }})).subtract('month', 1).toDate(), {% endfor %}],
               datasets: [{
                 label: 'Savings',
                 data: [{% for charge_attempt in charge_attempts %} {{ charge_attempt.savings|floatformat:2 }}, {% endfor %}],
@@ -142,7 +142,7 @@ h1{color: #005b96;}
             var config1 = {
               type: 'line',
               data: {
-                labels: [{% for charge_period in charge_attempt.periods %} moment(new Date(20{{ charge_period.beg_year }}, {{ charge_period.beg_month }}, {{ charge_period.beg_day }}, {{ charge_period.beg_hour }}, {{ charge_period.beg_min }})).subtract('month', 1).toDate(), moment(new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }})).subtract('month', 1).toDate(), new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }}), {% endfor %} ],
+                labels: [{% for charge_period in charge_attempt.periods %} moment(new Date(20{{ charge_period.beg_year }}, {{ charge_period.beg_month }}, {{ charge_period.beg_day }}, {{ charge_period.beg_hour }}, {{ charge_period.beg_min }})).subtract('month', 1).toDate(), moment(new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }})).subtract('month', 1).toDate(), moment(new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }})).subtract('month', 1).toDate(), {% endfor %} ],
                 datasets: [{
                   label: 'Charge Period',
                   data: [{% for charge_period in charge_attempt.periods %} {{ charge_period.kwh|floatformat:2 }}, {{ charge_period.kwh|floatformat:2 }}, null, {% endfor %}],   
