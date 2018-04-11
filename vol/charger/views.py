@@ -110,8 +110,6 @@ def index(request):
     v[vid].checked = True
 
   context = {
-    # 'vehicle_list': vehicle_list,
-    # 'vehicle_scheduled': vehicle_scheduled,
     'v': v,
   }
   return render(request, 'charger/index.html', context)
@@ -170,18 +168,7 @@ def logout(request):
 
 def savings(request):
   vehicle_owner = Owner.objects.get(username=request.session[SESSION_USERNAME])
-  vehicle_scheduled = Vehicle.objects.filter(owner=vehicle_owner)
-
-  if request.method == 'POST':
-    for vehicle in vehicle_scheduled:
-      if vehicle.vehicle_id in request.POST:
-        vehicle.plug_time = datetime.datetime.strptime(request.POST[vehicle.vehicle_id], TIMESTAMP_FORMAT).time()
-        vehicle.save()
-
-  for vehicle in vehicle_scheduled:
-    vehicle.str_time = vehicle.plug_time.strftime(TIMESTAMP_FORMAT)
-    vehicle.str_unplug_time = vehicle.unplug_time.strftime(TIMESTAMP_FORMAT)
-
+  
   # Savings calculations
   charge_attempts = ChargeAttempt.objects.filter(owner=vehicle_owner).order_by('default_start')
   total_savings = decimal.Decimal(0.0)
@@ -230,7 +217,6 @@ def savings(request):
     total_savings += savings / 100
 
   return render(request, 'charger/savings.html', {
-    'vehicle_scheduled': vehicle_scheduled,
     'charge_attempts': charge_attempts,
     'total_savings': total_savings
   })

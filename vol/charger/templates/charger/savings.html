@@ -2,15 +2,36 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
 <style>
-.container {margin: 10%;}
+.container {margin: 3%;}
 h1{color: #005b96;}
+.header .active a,
+.header .active a:hover {
+    background-color: #005b96;
+}
+
 </style>
 </head>
 
 <body>
+
   <div class="container" id="savings_shit">
+    <div class="row">
+      <ul class="nav nav-tabs header">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'charger:index' %}">Vehicles</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'charger:savings' %}">Savings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'charger:logout' %}">Logout</a>
+        </li>
+      </ul>
+    </div>
+    <br>
 
     <h1>Your savings</h1>
 
@@ -19,18 +40,6 @@ h1{color: #005b96;}
     <p>To obtain accurate savings data, please input the approximate time you come home from work and plug
     in your Tesla that you have scheduled for charging each day. This information will be used to determine when to 
     start checking whether the Tesla has been plugged in.</p>
-
-    {% if vehicle_scheduled %}
-      <form action="{% url 'charger:savings' %}" method="post">
-        {% csrf_token %}
-        {% for vehicle in vehicle_scheduled %}
-          <input type="time" name="{{ vehicle.vehicle_id }}" id="{{ vehicle.vehicle_id }}" value="{{ vehicle.str_time }}"> {{ vehicle.name }} <br>
-        {% endfor %}
-        <input type="submit" value="Update"/>
-      </form>
-    {% else %}
-      <p>It looks like you have no vehicles scheduled for charging. You can still view your historical data below.</p>
-    {% endif %}
 
     <form action="{% url 'charger:index' %}" method="get">
       <button type="submit" class="btn btn-outline-warning">Vehicles</button>
