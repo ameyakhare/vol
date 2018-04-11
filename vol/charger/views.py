@@ -32,6 +32,10 @@ YEAR_FORMAT  = '%y'
 HOUR_FORMAT = '%H'
 MINUTE_FORMAT = '%M'
 
+class Object:
+  def __init__(self):
+    pass
+
 def get_owner(user):
   try:
     owner = Owner.objects.get(username=user)
@@ -40,6 +44,7 @@ def get_owner(user):
     return None
 
 def index(request):
+  v = {}
   req = requests.get(
     TESLA_PATH_VEHICLES, 
     headers = {
@@ -55,33 +60,59 @@ def index(request):
 
   # Conform to string
   for vehicle in vehicle_list:
+    info = Object()
+    info.id = str(vehicle['id'])
+    info.display_name = vehicle['display_name']
+    info.plug_time = datetime.time(hour=19, minute=0).strftime(TIMESTAMP_FORMAT)
+    info.unplug_time = datetime.time(hour=6, minute=0).strftime(TIMESTAMP_FORMAT)
+    info.checked = False
+    v[vehicle['id']] = info
     vehicle['id'] = str(vehicle['id'])
 
   # The user has requested an update to the charging status of their vehicles.
   user = Owner.objects.get(username=request.session[SESSION_USERNAME])
   if request.method == 'POST':
     for vehicle in vehicle_list:
-      if vehicle['id'] in request.POST and not Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).exists():
+      # print(type(vehicle))
+      vehicle_checked = (vehicle['id'] + "_check") in request.POST
+
+      if vehicle_checked and not Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).exists():
         # If the vehicle was checked, make sure its in the db
-        Vehicle(owner=user, vehicle_id=vehicle['id'], name=vehicle['display_name']).save()
+        new_vehicle = Vehicle(owner=user, vehicle_id=vehicle['id'], name=vehicle['display_name'])
+        new_vehicle.plug_time = datetime.datetime.strptime(request.POST[vehicle['id'] + "_plug"], TIMESTAMP_FORMAT).time()
+        new_vehicle.unplug_time = datetime.datetime.strptime(request.POST[vehicle['id'] + "_unplug"], TIMESTAMP_FORMAT).time()
+        new_vehicle.save()
 
         print('Adding vehicle: ' + vehicle['display_name'])
-      elif vehicle['id'] not in request.POST and Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).exists():
+      elif vehicle_checked and Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).exists():
         # If the vehicle was not checked, make sure its not in the db
-        Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).delete()
+        existing_vehicle = Vehicle.objects.get(owner=user, vehicle_id=vehicle['id'])
+        existing_vehicle.plug_time = datetime.datetime.strptime(request.POST[vehicle['id'] + "_plug"], TIMESTAMP_FORMAT).time()
+        existing_vehicle.unplug_time = datetime.datetime.strptime(request.POST[vehicle['id'] + "_unplug"], TIMESTAMP_FORMAT).time()
+        existing_vehicle.save()
+
+        print('Updating vehicle: ' + vehicle['display_name'])
+      elif not vehicle_checked and Vehicle.objects.filter(owner=user, vehicle_id=vehicle['id']).exists():
+        Vehicle.objects.get(owner=user, vehicle_id=vehicle['id']).delete()
 
         print('Removing vehicle: ' + vehicle['display_name'])
 
   vehicle_owner = Owner.objects.get(username=request.session[SESSION_USERNAME])
-  vehicle_known = Vehicle.objects.filter(owner=vehicle_owner)
+  vehicle_scheduled = Vehicle.objects.filter(owner=vehicle_owner)
 
-  vehicle_scheduled = []
-  for vehicle in vehicle_known:
-    vehicle_scheduled.append(vehicle.vehicle_id)
+  
+  for vehicle in vehicle_scheduled:
+    vehicle.str_time = vehicle.plug_time.strftime(TIMESTAMP_FORMAT)
+    vehicle.str_unplug_time = vehicle.unplug_time.strftime(TIMESTAMP_FORMAT)
+    vid = int(vehicle.vehicle_id)
+    v[vid].plug_time = vehicle.str_time
+    v[vid].unplug_time = vehicle.str_unplug_time
+    v[vid].checked = True
 
   context = {
-    'vehicle_list': vehicle_list,
-    'vehicle_scheduled': vehicle_scheduled,
+    # 'vehicle_list': vehicle_list,
+    # 'vehicle_scheduled': vehicle_scheduled,
+    'v': v,
   }
   return render(request, 'charger/index.html', context)
 
@@ -149,6 +180,7 @@ def savings(request):
 
   for vehicle in vehicle_scheduled:
     vehicle.str_time = vehicle.plug_time.strftime(TIMESTAMP_FORMAT)
+    vehicle.str_unplug_time = vehicle.unplug_time.strftime(TIMESTAMP_FORMAT)
 
   # Savings calculations
   charge_attempts = ChargeAttempt.objects.filter(owner=vehicle_owner).order_by('default_start')

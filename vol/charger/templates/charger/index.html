@@ -13,20 +13,55 @@ h1{color: #005b96;}
     <p>If there is a check next to the vehicle name, it is scheduled to charge overnight to standard capacity (80%).</p>
     <p>Please update the form if you would like to schedule or unschedule the charging of your vehicle.</p>
 
-    {% if vehicle_list %}
+    {% if v %}
       <div class="alert alert-light" role="alert">
-        <form action="{% url 'charger:index' %}" method="post">
+        <table class="table">
+            <tr>
+              <th scope="col"> Vehicle Name </th>
+              <th scope="col"> Plugin Time </th>
+              <th scope="col"> Unplug Time </th>
+              <th scope="col"> Set to Charge </th>
+            </tr>
+            <form action="{% url 'charger:index' %}" method="post">
+            {% csrf_token %}
+              {% for id, vehicle in v.items %}
+            <tr>
+              <td scope="col"> {{ vehicle.display_name }}</td>
+              <td> <input type="time" name="{{ vehicle.id }}_plug" id="{{ vehicle.id }}" value="{{ vehicle.plug_time }}"> </td>
+              <td>  <input type="time" name="{{ vehicle.id }}_unplug" id="{{ vehicle.id }}" value="{{ vehicle.unplug_time }}"> </td>
+              <td>  <input type="checkbox" name="{{ vehicle.id }}_check" id="{{ vehicle.id }}" 
+              {% if vehicle.checked %} 
+                checked="checked"
+              {% endif %}/> </td>
+            </tr>
+            {% endfor %}
+          </table>
+          <button type="submit" class="btn btn-warning" value="Update">Update</button>
+          </form>
+
+
+        <!-- <form action="{% url 'charger:index' %}" method="post">
         {% csrf_token %}
           {% for vehicle in vehicle_list %}
+            {{ vehicle.display_name }}
+            <input type="time" name="{{ vehicle.id }}" id="{{ vehicle.id }}_plug" value="{{ vehicle.str_time }}">
+            <input type="time" name="{{ vehicle.id }}" id="{{ vehicle.id }}_unplug" value="{{ vehicle.str_unplug_time }}">
             <input type="checkbox" name="{{ vehicle.id }}" id="{{ vehicle.id }}" 
               {% if vehicle.id in vehicle_scheduled %} 
                 checked="checked"
-              {% endif %}
-            /> {{ vehicle.display_name }} <br>
+              {% endif %}/>
+            <br>
           {% endfor %}
           <br>
             <button type="submit" class="btn btn-warning" value="Update">Update</button>
-        </form>
+        </form> -->
+<!--         <form action="{% url 'charger:savings' %}" method="post">
+        {% csrf_token %}
+        {% for vehicle in vehicle_scheduled %}
+          <input type="time" name="{{ vehicle.vehicle_id }}" id="{{ vehicle.vehicle_id }}" value="{{ vehicle.str_time }}"> {{ vehicle.name }} <br>
+        {% endfor %}
+        <input type="submit" value="Update"/>
+      </form> -->
       </div>
       <form action="{% url 'charger:savings' %}" method="get">
         <button type="submit" class="btn btn-outline-warning" value="View Savings">View Savings</button>
