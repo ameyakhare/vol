@@ -137,7 +137,7 @@ h1{color: #005b96;}
             var config1 = {
               type: 'line',
               data: {
-                labels: [{% for charge_period in charge_attempt.periods %} new Date(20{{ charge_period.beg_year }}, {{ charge_period.beg_month }}, {{ charge_period.beg_day }}, {{ charge_period.beg_hour }}, {{ charge_period.beg_min }}), new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }}), new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }}), {% endfor %} ],
+                labels: [{% for charge_period in charge_attempt.periods %} moment(new Date(20{{ charge_period.beg_year }}, {{ charge_period.beg_month }}, {{ charge_period.beg_day }}, {{ charge_period.beg_hour }}, {{ charge_period.beg_min }})).subtract('month', 1).toDate(), moment(new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }})).subtract('month', 1).toDate(), new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }}), {% endfor %} ],
                 datasets: [{
                   label: 'Charge Period',
                   data: [{% for charge_period in charge_attempt.periods %} {{ charge_period.kwh|floatformat:2 }}, {{ charge_period.kwh|floatformat:2 }}, null, {% endfor %}],   
