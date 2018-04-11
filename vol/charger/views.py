@@ -29,6 +29,8 @@ DATE_FORMAT = '%m %d %y'
 MONTH_FORMAT = '%m'
 DAY_FORMAT = '%d'
 YEAR_FORMAT  = '%y'
+HOUR_FORMAT = '%H'
+MINUTE_FORMAT = '%M'
 
 def get_owner(user):
   try:
@@ -175,9 +177,18 @@ def savings(request):
       charge_period.start_str = charge_period.start.strftime(DATETIME_FORMAT)
       charge_period.end_str = charge_period.end.strftime(DATETIME_FORMAT)
 
-      charge_period.day = charge_period.start.strftime(DAY_FORMAT)
-      charge_period.month = charge_period.start.strftime(MONTH_FORMAT)
-      charge_period.year = charge_period.start.strftime(YEAR_FORMAT)
+      charge_period.beg_day = charge_period.start.strftime(DAY_FORMAT)
+      charge_period.beg_month = charge_period.start.strftime(MONTH_FORMAT)
+      charge_period.beg_year = charge_period.start.strftime(YEAR_FORMAT)
+      charge_period.beg_hour = charge_period.start.strftime(HOUR_FORMAT)
+      charge_period.beg_min = charge_period.start.strftime(MINUTE_FORMAT)
+
+
+      charge_period.end_day = charge_period.end.strftime(DAY_FORMAT)
+      charge_period.end_month = charge_period.end.strftime(MONTH_FORMAT)
+      charge_period.end_year = charge_period.end.strftime(YEAR_FORMAT)
+      charge_period.end_hour = charge_period.end.strftime(HOUR_FORMAT)
+      charge_period.end_min = charge_period.end.strftime(MINUTE_FORMAT)
 
       charge_period.cost = charge_period.price * charge_period.kwh
       charge_period.saving = (charge_attempt.default_price - charge_period.price) * charge_period.kwh

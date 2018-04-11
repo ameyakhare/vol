@@ -39,15 +39,29 @@ h1{color: #005b96;}
         <canvas id="SavingsChart" width="400" height="400"></canvas>
         <script>
           //var ctx = $("#SavingsChart");
+          /*
 
+                borderColor: [
+                'rgba(255,99,132,1)'
+                ],
+                backgroundColor: [
+                'rgba(255,99,132,1)'
+                ],
+                */
           var config = {
             type: 'line',
             data: {
-              labels: [{% for charge_attempt in charge_attempts %} new Date(20{{ charge_attempt.year }}, {{ charge_attempt.month }}, {{charge_attempt.day}}), {% endfor %} new Date(2018, 04, 03), new Date(2018, 04, 04), new Date(2018, 04, 05), new Date(2018, 04, 06), new Date(2018, 04, 07)],
+              labels: [{% for charge_attempt in charge_attempts %} new Date(20{{ charge_attempt.year }}, {{ charge_attempt.month }}, {{ charge_attempt.day }}), {% endfor %} new Date(2018, 04, 03), new Date(2018, 04, 04), new Date(2018, 04, 05), new Date(2018, 04, 06), new Date(2018, 04, 07)],
               datasets: [{
                 label: 'Savings',
-                data: [{% for charge_attempt in charge_attempts %} {{ charge_attempt.savings|floatformat:2 }}, {% endfor %}, 1, 2, 3, 4, 5]
-              }]
+                data: [{% for charge_attempt in charge_attempts %} {{ charge_attempt.savings|floatformat:2 }}, {% endfor %} 1, 2, 3, 4, 5],
+                borderColor: [
+                    'rgba(252,193,43,1)'
+                    ],
+                backgroundColor: [
+                    'rgba(252,193,43,1)'
+                    ]
+              }],
             },
             options: {
               scales: {
@@ -99,23 +113,32 @@ h1{color: #005b96;}
               <td> {{ charge_period.saving }}¢ </td>
             </tr>
             {% endfor %}
+
           </table>
+
+          <div style="width:500px; height:500px;" id="div{{ charge_attempt.num }}"></div>
 
           <script>
             var newCanvas = document.createElement("canvas");
             
             newCanvas.id  = 'canvasnum{{ charge_attempt.num }}';
-            newCanvas.width = "100"
-            newCanvas.height = "100"
+            newCanvas.width = 50
+            newCanvas.height = 50
 
-            $("#li{{ charge_attempt.num }}").append(newCanvas);
+            $("#div{{ charge_attempt.num }}").append(newCanvas);
             var config1 = {
               type: 'line',
               data: {
-                labels: [{% for charge_period in charge_attempt.periods %} new Date(20{{ charge_period.year }}, {{ charge_period.month }}, {{charge_period.day}}), {% endfor %} ],
+                labels: [{% for charge_period in charge_attempt.periods %} new Date(20{{ charge_period.beg_year }}, {{ charge_period.beg_month }}, {{ charge_period.beg_day }}, {{ charge_period.beg_hour }}, {{ charge_period.beg_min }}), new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }}), new Date(20{{ charge_period.end_year }}, {{ charge_period.end_month }}, {{ charge_period.end_day }}, {{ charge_period.end_hour }}, {{ charge_period.end_min }}), {% endfor %} ],
                 datasets: [{
-                  label: 'Savings',
-                  data: [{% for charge_period in charge_attempt.periods %} {{ charge_period.cost|floatformat:2 }}, {% endfor %}]
+                  label: 'Charge Period',
+                  data: [{% for charge_period in charge_attempt.periods %} {{ charge_period.cost|floatformat:2 }}, {{ charge_period.cost|floatformat:2 }}, null, {% endfor %}],   
+                  borderColor: [
+                      'rgba(252,193,43,1)'
+                      ],
+                  backgroundColor: [
+                      'rgba(252,193,43,1)'
+                      ]
                 }]
               },
               options: {
@@ -125,7 +148,7 @@ h1{color: #005b96;}
                         time: {
                           unit : 'day',
                           displayFormats: {
-                            day : 'MM DD YY'
+                            day : 'MM DD YY hh mm'
                           }
                         },
                         ticks: {
@@ -137,6 +160,8 @@ h1{color: #005b96;}
               }
             };
             var ctx1 = document.getElementById('canvasnum{{ charge_attempt.num }}').getContext('2d');
+            ctx1.canvas.width = 50;
+            ctx1.canvas.height = 50;
 
             window.myLine = new Chart(ctx1, config1);
 
