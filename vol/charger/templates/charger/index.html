@@ -78,13 +78,6 @@ h1{color: #005b96;}
         <input type="submit" value="Update"/>
       </form> -->
       </div>
-      <form action="{% url 'charger:savings' %}" method="get">
-        <button type="submit" class="btn btn-outline-warning" value="View Savings">View Savings</button>
-      </form>
-
-      <form action="{% url 'charger:logout' %}" method="get">
-        <button type="submit" class="btn btn-outline-warning" value="Logout">Logout</button>
-      </form>
     {% else %}
       <p>Looks like you don't have any vehicles!</p>
     {% endif %}
