@@ -170,7 +170,7 @@ def savings(request):
   vehicle_owner = Owner.objects.get(username=request.session[SESSION_USERNAME])
   
   # Savings calculations
-  charge_attempts = ChargeAttempt.objects.filter(owner=vehicle_owner).order_by('default_start')
+  charge_attempts = ChargeAttempt.objects.filter(owner=vehicle_owner).order_by('-default_start')
   total_savings = decimal.Decimal(0.0)
   
   num = 0
